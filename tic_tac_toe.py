@@ -1,4 +1,5 @@
 from typing import List
+import os
 
 
 def change_elements(x: int, y: int, surface: List[List[str]], plaer_team: str) -> List[List[str]]:
@@ -120,30 +121,27 @@ def checking_for_a_cell_for_players(surface: List[List[str]], x: int, y: int):
         return False
 
 
+def clean():
+    os.system('cls')
+
+
 def main():
     surface = generate_surface()
-    player_team = "X"
+    player_team = "O"
     while not check_winner_all(player_team, surface) and not fullness_field(surface):
+        clean()
+        player_team = switch_player(player_team)
         show_surface(surface)
-        print(1)
         remind(player_team)
-        x, y = map(int, input(">> "))
-        if not checking_for_a_cell_for_players(surface, x, y):
-            change_elements(x, y, surface, player_team)
-            if not check_winner_all(player_team, surface):
-                player_team = switch_player(player_team)
-            else:
-                print("Player", player_team, " win !", sep=' ')
-        else:
-            while checking_for_a_cell_for_players(surface, x, y):
-                print("the values of the already occupied cell are entered !")
-                print("enter the correct value !")
-                x, y = map(int, input(">> "))
-                if not checking_for_a_cell_for_players(surface, x, y):
-                    change_elements(x, y, surface, player_team)
-                    show_surface(surface)
-                    player_team = switch_player(player_team)
-    if fullness_field(surface):
+        x, y = map(int, input(">> ").split())
+        while checking_for_a_cell_for_players(surface, x, y):
+            print("the values of the already occupied cell are entered !")
+            print("enter the correct value !")
+            x, y = map(int, input(">> ").split())
+        change_elements(x, y, surface, player_team)
+    if check_winner_all(player_team, surface):
+        print("Player", player_team, " win !", sep=' ')
+    else:
         print("Draw !")
 
 
