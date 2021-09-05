@@ -95,17 +95,18 @@ def fullness_field(surface: List[List[str]]) -> bool:
     return True
 
 
-def check_winner_all(player_team: str, surface: List[List[str]]) -> bool:
+def check_winner_all(surface: List[List[str]]) -> str:
     '''
-    >>> check_winner_all("X", [["X", "X", "X"], [".", ".", "."], [".", ".", "."]])
-    True
-    >>> check_winner_all("X", [[".", ".", "."], [".", ".", "."], [".", ".", "."]])
-    False
+    >>> check_winner_all([["X", "X", "X"], [".", ".", "."], [".", ".", "."]])
+    'X'
+    >>> check_winner_all([[".", ".", "."], [".", ".", "."], [".", ".", "."]])
+    ''
     '''
-    if check_winner_horizontal(player_team, surface) or check_winner_vertical(player_team, surface) or \
-            check_winner_diagonal_waning(player_team, surface) or check_winner_diagonal_increase(player_team, surface):
-        return True
-    return False
+    for player_team in "XO":
+        if check_winner_horizontal(player_team, surface) or check_winner_vertical(player_team, surface) or \
+                check_winner_diagonal_waning(player_team, surface) or check_winner_diagonal_increase(player_team, surface):
+            return player_team
+    return ''
 
 
 def checking_for_a_cell_for_players(surface: List[List[str]], x: int, y: int):
@@ -164,12 +165,12 @@ def handle_command(command: str, surface: List[List[str]], player_team: str) -> 
         print("no load")
         return player_team
     x, y = map(int, command.split())
-    while checking_for_incorrect_input(x, y):
-        print("Enter the correct coordinates !")
-        x, y = map(int, input(">> ").split())
-    while checking_for_a_cell_for_players(surface, x, y):
-        print("the values of the already occupied cell are entered !")
-        print("enter the correct value !")
+    while checking_for_incorrect_input(x, y) or checking_for_a_cell_for_players(surface, x, y):
+        if checking_for_incorrect_input(x, y):
+            print("Enter the correct coordinates !")
+        else:
+            print("the values of the already occupied cell are entered !")
+            print("enter the correct value !")
         x, y = map(int, input(">> ").split())
     change_elements(x, y, surface, player_team)
     return switch_player(player_team)
@@ -179,12 +180,14 @@ def main():
     surface = generate_surface()
     player_team = "X"
     save(surface, player_team)
-    while not check_winner_all(player_team, surface) and not fullness_field(surface):
+    while not check_winner_all(surface) and not fullness_field(surface):
         show(surface, player_team)
         command = input(">> ")
-        handle_command(command, surface, player_team)
-    if check_winner_all(player_team, surface):
-        print("Player", player_team, " win !", sep=' ')
+        player_team = handle_command(command, surface, player_team)
+    winner = check_winner_all(surface)
+    show_surface(surface)
+    if winner != '':
+        print("Player", winner, " win !", sep=' ')
     else:
         print("Draw !")
 
