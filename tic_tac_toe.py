@@ -125,20 +125,64 @@ def clean():
     os.system('cls')
 
 
+def checking_for_incorrect_input(x: int, y: int) -> bool:
+    '''
+    >>> checking_for_incorrect_input(10, 0)
+    True
+    >>> checking_for_incorrect_input(1, 1)
+    False
+    >>> checking_for_incorrect_input(0, 2)
+    False
+    '''
+    if 0 < x > 2 or 0 < y > 2:
+        return True
+    return False
+
+
+def save(surface: List[List[str]], player_team: str) -> None:
+    save = open("save.txt", "w")
+
+
+def show(surface: List[List[str]], player_team: str) -> None:
+    clean()
+    show_surface(surface)
+    remind(player_team)
+
+
+def handle_command(command: str, surface: List[List[str]], player_team: str) -> str:
+    """
+
+    :param command:
+    :param surface:
+    :param player_team:
+    :return: actual player_team for next turn
+    """
+    if command == "save":
+        save(surface, player_team)
+        return player_team
+    if command == "load":
+        print("no load")
+        return player_team
+    x, y = map(int, command.split())
+    while checking_for_incorrect_input(x, y):
+        print("Enter the correct coordinates !")
+        x, y = map(int, input(">> ").split())
+    while checking_for_a_cell_for_players(surface, x, y):
+        print("the values of the already occupied cell are entered !")
+        print("enter the correct value !")
+        x, y = map(int, input(">> ").split())
+    change_elements(x, y, surface, player_team)
+    return switch_player(player_team)
+
+
 def main():
     surface = generate_surface()
-    player_team = "O"
+    player_team = "X"
+    save(surface, player_team)
     while not check_winner_all(player_team, surface) and not fullness_field(surface):
-        clean()
-        player_team = switch_player(player_team)
-        show_surface(surface)
-        remind(player_team)
-        x, y = map(int, input(">> ").split())
-        while checking_for_a_cell_for_players(surface, x, y):
-            print("the values of the already occupied cell are entered !")
-            print("enter the correct value !")
-            x, y = map(int, input(">> ").split())
-        change_elements(x, y, surface, player_team)
+        show(surface, player_team)
+        command = input(">> ")
+        handle_command(command, surface, player_team)
     if check_winner_all(player_team, surface):
         print("Player", player_team, " win !", sep=' ')
     else:
@@ -147,4 +191,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
