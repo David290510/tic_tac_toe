@@ -141,7 +141,19 @@ def checking_for_incorrect_input(x: int, y: int) -> bool:
 
 
 def save(surface: List[List[str]], player_team: str) -> None:
-    save = open("save.txt", "w")
+    save_file = open("save.txt", "w")
+    for i in range(len(surface)):
+        save_file.write(" ".join(surface[i]))
+        save_file.write("\n")
+    save_file.write(player_team)
+    save_file.close()
+
+
+def load():
+    save_file = open("save.txt", "r")
+    surface = [save_file.readline().split() for _ in range(3)]
+    player_team = save_file.readline()
+    return player_team, surface
 
 
 def show(surface: List[List[str]], player_team: str) -> None:
@@ -162,7 +174,7 @@ def handle_command(command: str, surface: List[List[str]], player_team: str) -> 
         save(surface, player_team)
         return player_team
     if command == "load":
-        print("no load")
+        player_team, surface[:] = load()
         return player_team
     x, y = map(int, command.split())
     while checking_for_incorrect_input(x, y) or checking_for_a_cell_for_players(surface, x, y):
@@ -179,7 +191,6 @@ def handle_command(command: str, surface: List[List[str]], player_team: str) -> 
 def main():
     surface = generate_surface()
     player_team = "X"
-    save(surface, player_team)
     while not check_winner_all(surface) and not fullness_field(surface):
         show(surface, player_team)
         command = input(">> ")
